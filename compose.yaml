@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_USER: 'gopher'
+      DB_PASSWORD: 'secret'
+      DB_HOST: 'db'
+      DB_PORT: '3306'
+      DB_NAME: 'mydb'
+      NEW_RELIC_APP_NAME: 'slow-query-example-app'
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+  db:
+    image: mysql:8.4.1
+    ports:
+      - '3306:3306'
+    volumes:
+      - type: volume
+        source: db-store
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      TZ: UTC
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: gopher
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+
+volumes:
+  db-store:
