@@ -118,7 +118,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := db.QueryRowContext(r.Context(), "INSERT INTO users (name, email) VALUES (?, ?) RETURNING id", u.Name, u.Email).Scan(&u.ID)
+	_, err := db.ExecContext(r.Context(), "INSERT INTO users (name, email) VALUES (?, ?)", u.Name, u.Email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
